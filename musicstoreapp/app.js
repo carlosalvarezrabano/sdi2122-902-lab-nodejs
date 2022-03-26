@@ -6,17 +6,9 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+require("./routes/songs.js")(app);
 
 var app = express();
-
-app.get("/songs", function (req, res) {
-  console.log("depurar aqui")
-  res.send("Lista de canciones")
-});
-app.get("/singers", function (req, res) {
-  console.log("depurar aqui")
-  res.send("Lista de cantantes")
-});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
