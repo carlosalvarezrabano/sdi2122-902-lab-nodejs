@@ -8,9 +8,11 @@ module.exports = function(app) {
         res.send(response);
     });
 
-    app.get('/add', function(req, res) {
-        let response = parseInt(req.query.num1) + parseInt(req.query.num2);;
-        res.send(String(response));
+    app.get('/songs/add', function(req, res) {
+        let response = "Canción agregada: " + req.body.title + "<br>"
+            + " género: " + req.body.kind + "<br>"
+            + " precio: " + req.body.price + "<br>";
+        res.send(response);
     });
 
     app.get('/songs/:id', function(req, res) {
