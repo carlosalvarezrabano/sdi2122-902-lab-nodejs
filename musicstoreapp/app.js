@@ -4,11 +4,11 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+var app = express();
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 require("./routes/songs.js")(app);
-
-var app = express();
 
 let bodyParser = require('body-parser');
 app.use(bodyParser.json());

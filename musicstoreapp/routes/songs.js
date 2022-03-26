@@ -1,18 +1,27 @@
-module.exports = function(app) {
+module.exports = function(app, swig) {
     app.get("/songs", function(req, res) {
-        let response="";
-        if(req.query.title != null && typeof(req.query.title) != "undefined")
-            response='Título: ' + req.query.title + '<br>';
-        if(req.query.author != null && typeof(req.query.author) != "undefined")
-            response='Título: ' + req.query.title + '<br>';
-        res.send(response);
+        let songs = [{
+            "title": "Blank Space",
+            "price": 1.2
+        },
+        {
+            "title": "See You Again",
+            "price": 1.3
+        },
+        {
+            "title": "Uptown Funk",
+            "price": 1.1
+        }];
+
+        let response = {
+            seller : 'Tienda de canciones',
+            songs : songs
+        };
+        res.sender("shop.twig", response);
     });
 
     app.get('/songs/add', function(req, res) {
-        let response = "Canción agregada: " + req.body.title + "<br>"
-            + " género: " + req.body.kind + "<br>"
-            + " precio: " + req.body.price + "<br>";
-        res.send(response);
+        res.render("add.twig");
     });
 
     app.get('/songs/:id', function(req, res) {
