@@ -10,9 +10,14 @@ let bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const { MongoClient } = require("mongodb");
+const url = 'mongodb+srv://admin:sdi@tiendamusica.0wsg5.mongodb.net' +
+    '/myFirstDatabase?retryWrites=true&w=majority';
+app.set('connectionStrings', url);
+
 let indexRouter = require('./routes/index');
 let usersRouter = require('./routes/users');
-require("./routes/songs.js")(app);
+require("./routes/songs.js")(app, swig, MongoClient);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
