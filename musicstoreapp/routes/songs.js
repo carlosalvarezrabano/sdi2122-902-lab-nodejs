@@ -1,4 +1,4 @@
-module.exports = function(app, swig, MongoClient) {
+module.exports = function(app, songsRepository) {
     app.get("/songs", function(req, res) {
         let songs = [{
             "title": "Blank Space",
@@ -30,17 +30,12 @@ module.exports = function(app, swig, MongoClient) {
             kind: req.body.kind,
             price: req.body.price
         }
-        MongoClient.connect(app.get('connectionStrings'), function (err, dbClient) {
-            if (err) {
-                res.send("Error de conexión: " + err);
-            } else {
-                const database = dbClient.db("tiendamusica");
-                const collectionName = 'songs';
-                const songsCollection = database.collection(collectionName);
-                songsCollection.insertOne(song)
-                    .then(result => res.send("canción añadida id: " + result.insertedId))
-                    .then(() => dbClient.close())
-                    .catch(err => res.send("Error al insertar " + err));
+        songsRepository.insertSong(song, function (songId) {
+            if (songId == null) {
+                res.send("Error al insertar canción");
+            }
+            else {
+                res.send("Agregada la canción con ID: " + songId);
             }
         });
     });
