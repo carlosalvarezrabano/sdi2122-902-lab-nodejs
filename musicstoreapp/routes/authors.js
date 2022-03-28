@@ -24,7 +24,22 @@ module.exports = function (app, swig) {
     });
 
     app.get('/authors/add', function(req, res) {
-        res.render("authors/add.twig");
+        let roles = [{
+            value: "cantante"
+        }, {
+            value: "bateria"
+        }, {
+            value: "guitarrista"
+        }, {
+            value: "bajista"
+        }, {
+            value: "teclista"
+        }];
+
+        let response = {
+            roles : roles
+        }
+        res.render("authors/add.twig", response);
     });
 
     app.post('/authors/add', function(req, res) {
