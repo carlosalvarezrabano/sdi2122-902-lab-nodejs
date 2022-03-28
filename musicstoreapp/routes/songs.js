@@ -24,6 +24,13 @@ module.exports = function(app, swig) {
         res.render("add.twig");
     });
 
+    app.post('/songs/add', function(req, res) {
+        let response = 'Canción agregada: ' + req.body.title + '<br>'
+            + 'Género: ' + req.body.kind
+            + 'Precio: ' + req.body.price;
+        res.send(response);
+    });
+
     app.get('/songs/:id', function(req, res) {
         let response = 'id: ' + req.params.id;
         res.send(response);
