@@ -1,4 +1,4 @@
-module.exports = function (app, swig) {
+module.exports = function (app) {
     app.get("/authors", function(req, res) {
         let authors = [{
             "name": "Antonio",
@@ -20,20 +20,20 @@ module.exports = function (app, swig) {
             seller : 'Lista de autores',
             authors : authors
         };
-        res.sender("authors.twig", response);
+        res.render("authors/authors.twig", response);
     });
 
     app.get('/authors/add', function(req, res) {
         let roles = [{
-            value: "cantante"
+            value: "Cantante"
         }, {
-            value: "bateria"
+            value: "Bateria"
         }, {
-            value: "guitarrista"
+            value: "Guitarrista"
         }, {
-            value: "bajista"
+            value: "Bajista"
         }, {
-            value: "teclista"
+            value: "Teclista"
         }];
 
         let response = {
@@ -43,18 +43,19 @@ module.exports = function (app, swig) {
     });
 
     app.post('/authors/add', function(req, res) {
-        if(req.query.name == null || typeof(req.query.name) == "undefined")
+        if(req.body.name != null && typeof(req.body.name) != "undefined") {
+            if(req.body.group != null && typeof(req.body.group) != "undefined") {
+                if(req.body.rol != null && typeof(req.body.rol) != "undefined") {
+                    let response = 'Autor agregado: ' + req.body.name + '<br>'
+                        + 'Grupo: ' + req.body.group + '<br>'
+                        + 'Rol: ' + req.body.rol;
+                    res.send(response);
+                } else
+                    res.send("Rol no enviado en la petición");
+            } else
+                res.send("Grupo no enviado en la petición");
+        } else
             res.send("Nombre no enviado en la petición");
-        if(req.query.group == null || typeof(req.query.group) == "undefined")
-            res.send("Grupo no enviado en la petición");
-        if(req.query.rol == null || typeof(req.query.rol) == "undefined")
-            res.send("Rol no enviado en la petición");
-        else {
-            let response = 'Autor agregado: ' + req.body.name + '<br>'
-                + 'Grupo: ' + req.body.group
-                + 'Rol: ' + req.body.rol;
-            res.send(response);
-        }
     });
 
     app.get('/authors/*', function (req, res) {

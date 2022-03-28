@@ -48,6 +48,8 @@ require("./routes/users.js")(app, usersRepository);
 let indexRouter = require('./routes/index');
 require("./routes/songs.js")(app, songsRepository);
 
+require("./routes/authors.js")(app);
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'twig');
