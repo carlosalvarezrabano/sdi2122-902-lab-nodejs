@@ -17,42 +17,29 @@
 		  </div>
 		</div>
 	  </div>
-	  
-	 <!--
-	 <div class="row" style="margin-top: 20px;" >
-		<div class="media col-xs-10">
-			  <div class="media-left media-middle">
-				<a href="#">
-				  <img class="media-object" src="../../public/images/user.png" >
-				</a>
-			  </div>
-			  <div class="media-body">
-				<h4 class="media-heading">Middle aligned media</h4>
-				Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-			  </div>
-		  </div>
-		<div class="media col-xs-10">
-			  <div class="media-left media-middle">
-				<a href="#">
-				  <img class="media-object" src="../../public/images/user.png" >
-				</a>
-			  </div>
-			  <div class="media-body">
-				<h4 class="media-heading">Middle aligned media</h4>
-				Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-			  </div>
-		  </div>
-		<div class="media col-xs-10">
-			  <div class="media-left media-middle">
-				<a href="#">
-				  <img class="media-object" src="../../public/images/user.png" >
-				</a>
-			  </div>
-			  <div class="media-body">
-				<h4 class="media-heading">Middle aligned media</h4>
-				Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin commodo. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-			  </div>
-		  </div>
+
+	<div>
+	  <div>
+		<h4>Comentarios de la canción</h4>
+		{% for comment in comments %}
+		  <p>{{comment.author}} ha comentado: {{comment.text}}</p>
+		{% endfor %}
 	  </div>
-	-->
+	</div>
+	<div>
+		<h4>Agregar comentario</h4>
+		<form class="form-horizontal" method="post" action="/comments/{{song._id}}" enctype="multipart/form-data">
+			<div class="form-group">
+				<label class="control-label col-sm-2" for="text">Comentario:</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="text" name="text" placeholder="Mi primer comentario" required />
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<button type="submit" class="btn btn-primary">Agregar comentario</button>
+				</div>
+			</div>
+		</form>
+	</div>
 {% endblock %}
