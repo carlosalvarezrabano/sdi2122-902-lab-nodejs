@@ -5,6 +5,21 @@ module.exports = {
         this. mongoClient= mongoClient;
         this.app = app;
     },
+    findPurchase: async function (filter, options) {
+        try {
+            let isComprada = false;
+            const client = await this.mongoClient.connect(this.app.get('connectionStrings'));
+            const database = client.db("musicStore");
+            const collectionName = 'purchases';
+            const purchasesCollection = database.collection(collectionName);
+            const purchase = await purchasesCollection.findOne(filter, options);
+            if(purchase != null)
+                isComprada = true;
+            return isComprada;
+        } catch (error) {
+            throw (error);
+        }
+    },
     getPurchases: async function (filter, options) {
         try {
             const client = await this.mongoClient.connect(this.app.get('connectionStrings'));

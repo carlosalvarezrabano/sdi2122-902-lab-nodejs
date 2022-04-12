@@ -14,7 +14,7 @@ module.exports = function(app, commentsRepository) {
                 if (commentId == null) {
                     res.send("Error al insertar comentario");
                 } else {
-                    res.send("Agregado el comentario ID: " + commentId);
+                    res.redirect("/songs/"+req.params.song_id);
                 }
             });
         }

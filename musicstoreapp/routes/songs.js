@@ -29,7 +29,8 @@ module.exports = function(app, songsRepository, commentsRepository) {
             }
             res.render("shop.twig", response);
         }).catch(error => {
-           res.send("Se ha producido un error al listar las canciones: " + error);
+           res.redirect("/shop"+"?message=Se ha producido un error al listar las canciones" +
+               "&messageType=alert-danger");
         });
     });
 
@@ -39,7 +40,8 @@ module.exports = function(app, songsRepository, commentsRepository) {
         songsRepository.getSongs(filter, options).then(songs => {
             res.render("publications.twig", {songs: songs});
         }).catch(error => {
-            res.send("Se ha producido un error al listar las publicaciones del usuario:" + error)
+            res.redirect("/publications"+"?message=Se ha producido un error al listar las publicaciones" +
+                "&messageType=alert-danger");
         });
     });
 
@@ -56,20 +58,23 @@ module.exports = function(app, songsRepository, commentsRepository) {
         }
         songsRepository.insertSong(song, function (songId) {
             if (songId == null) {
-                res.send("Error al insertar canción");
+                res.redirect("/songs/add"+"?message=Se ha producido un error al añadir una canción" +
+                    "&messageType=alert-danger");
             }
             else {
                 if (req.files != null) {
                     let imagen = req.files.cover;
                     imagen.mv(app.get("uploadPath") + '/public/covers/' + songId + '.png', function (err) {
                         if (err) {
-                            res.send("Error al subir la portada de la canción");
+                            res.redirect("/songs/add"+"?message=Error al subir la portada de la canción" +
+                                "&messageType=alert-danger");
                         } else {
                             if (req.files.audio != null) {
                                 let audio = req.files.audio;
                                 audio.mv(app.get("uploadPath") + '/public/audios/' + songId + '.mp3', function (err) {
                                     if (err) {
-                                        res.send("Error al subir el audio");
+                                        res.redirect("/songs/add"+"?message=Error al subir el audio" +
+                                            "&messageType=alert-danger");
                                     } else {
                                         res.redirect("/publications");
                                     }
@@ -87,15 +92,25 @@ module.exports = function(app, songsRepository, commentsRepository) {
     app.get('/songs/:id', function(req, res) {
         let filter = {_id: ObjectID(req.params.id)};
         let filterComments = {song_id: ObjectID(req.params.id)};
+        let filterPurchase = {songId: ObjectID(req.params.id)};
         let options = {};
         songsRepository.findSong(filter, options).then(song => {
             commentsRepository.getComments(filterComments, options).then(comments => {
-                res.render("songs/song.twig", {song: song, comments : comments});
+                songsRepository.findPurchase(filterPurchase, options). then(isComprada => {
+                    if(song.author == req.session.user)
+                        isComprada = true;
+                    res.render("songs/song.twig", {song: song, comments : comments, comprada: isComprada});
+                }).catch(error => {
+                    res.redirect("/songs/:id"+"?message=Se ha producido un error al buscar la canción" +
+                        "&messageType=alert-danger");
+                })
             }).catch(error => {
-                res.send("Se ha producido un error al buscar el comentario " + error);
+                res.redirect("/songs/:id"+"?message=Se ha producido un error al buscar la canción" +
+                    "&messageType=alert-danger");
             })
         }).catch(error => {
-            res.send("Se ha producido un error al buscar la canción " + error);
+            res.redirect("/songs/:id"+"?message=Se ha producido un error al buscar la canción" +
+                "&messageType=alert-danger");
         });
     });
 
@@ -104,7 +119,8 @@ module.exports = function(app, songsRepository, commentsRepository) {
         songsRepository.findSong(filter, {}).then(song => {
             res.render("songs/edit.twig", {song: song});
         }).catch(error => {
-            res.send("Error a la hora de buscar una canción: " + error);
+            res.redirect("/songs/edit/:id"+"?message=Se ha producido un error al buscar la canción" +
+                "&messageType=alert-danger");
         })
     });
 
@@ -122,7 +138,8 @@ module.exports = function(app, songsRepository, commentsRepository) {
         songsRepository.updateSong(song, filter, options).then(result => {
             step1UpdateCover(req.files, songId, function (result) {
                 if (result == null) {
-                    res.send("Error al actualizar la portada o el audio de la canción");
+                    res.redirect("/songs/edit/:id"+"?message=Error al actualizar la portada o el audio de la canción" +
+                        "&messageType=alert-danger");
                 } else {
                     res.redirect("/publications");
                 }
@@ -134,12 +151,14 @@ module.exports = function(app, songsRepository, commentsRepository) {
         let filter = {_id: ObjectID(req.params.id)};
         songsRepository.deleteSong(filter, {}).then(result => {
             if (result == null || result.deletedCount == 0) {
-                res.send("No se ha podido eliminar el registro");
+                res.redirect("/songs/delete/:id"+"?message=No se ha podido eliminar el registro" +
+                    "&messageType=alert-danger");
             } else {
                 res.redirect("/publications");
             }
         }).catch(error => {
-            res.send("Se ha producido un error al intentar eliminar la canción: " + error)
+            res.redirect("/songs/delete/:id"+"?message=Se ha producido un error al intentar eliminar la canción" +
+                "&messageType=alert-danger");
         });
     });
 
@@ -149,9 +168,17 @@ module.exports = function(app, songsRepository, commentsRepository) {
             user: req.session.user,
             songId: songId
         }
+        let cancion, compra = null;
+        songsRepository.findSong({_id: songId}, {}).then(song => {
+           cancion = song;
+        });
+        songsRepository.findPurchase({songId: songId}, {}).then(isComprada => {
+           compra = isComprada;
+        });
         songsRepository.buySong(shop, function (shopId) {
-            if (shopId == null) {
-                res.send("Error al realizar la compra");
+            if (shopId == null || cancion != null || compra == true) {
+                res.redirect("/songs/buy/:id"+"?message=Error al realizar la compra" +
+                    "&messageType=alert-danger");
             } else {
                 res.redirect("/purchases");
             }
@@ -171,10 +198,12 @@ module.exports = function(app, songsRepository, commentsRepository) {
             songsRepository.getSongs(filter, options).then(songs => {
                 res.render("purchase.twig", {songs: songs});
             }).catch(error => {
-                res.send("Se ha producido un error al listar las publicaciones del usuario: " + error)
+                res.redirect("/purchases"+"?message=Se ha producido un error al listar las publicaciones del usuario" +
+                    "&messageType=alert-danger");
             });
         }).catch(error => {
-            res.send("Se ha producido un error al listar las canciones del usuario " + error)
+            res.redirect("/purchases"+"?message=Se ha producido un error al listar las publicaciones del usuario" +
+                "&messageType=alert-danger");
         });
     });
 
@@ -206,5 +235,14 @@ module.exports = function(app, songsRepository, commentsRepository) {
         } else {
             callback(true); // FIN
         }
+    };
+    function isComprada(filter, callback) {
+        let filterCancion = {songId: filter};
+        songsRepository.getPurchases(filterCancion, {}).then(purchase => {
+            if(purchase == null)
+                callback(false);
+            else
+                callback(true);
+        });
     };
 };
