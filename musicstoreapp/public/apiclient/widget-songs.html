@@ -1,12 +1,13 @@
 <div id="widget-songs" >
+    <input type="text" class="form-control" placeholder="Filtrar por nombre" id="filter-byname"/>
     <button class="btn btn-primary" onclick="widgetAddSong()">Nueva Canción</button>
     <button class="btn" onclick="loadSongs()" >Actualizar</button>
     <table class="table table-hover">
         <thead>
         <tr>
-            <th>Título</th>
+            <th><a onclick="sortByTitle()">Título</a></th>
             <th>Género</th>
-            <th>Precio</th>
+            <th><a onclick="sortByPrice()">Precio</a></th>
             <th class="col-md-1"></th>
         </tr>
         </thead>
@@ -15,6 +16,7 @@
 </div>
 
 <script>
+    window.history.pushState("", "", "/apiclient/client.html?w=songs");
     var selectedSongId;
     var songs;
 
@@ -76,6 +78,43 @@
 
     function widgetAddSong() {
         $( "#main-container" ).load( "widget-add.html");
+    }
+
+    $('#filter-by-name').on('input',function(e){
+        let filteredSongs = [];
+        let filterValue = $("#filter-by-name").val();
+        filteredSongs = songs.filter(song => song.title.includes(filterValue));
+        updateSongsTable(filteredSongs);
+    });
+
+    var priceDesc = true;
+    function sortByPrice() {
+        if (priceDesc) {
+            songs.sort(function (a, b) {
+                return parseFloat(a.price) - parseFloat(b.price);
+            });
+        } else {
+            songs.sort(function (a, b) {
+                return parseFloat(b.price) - parseFloat(a.price);
+            });
+        }
+        updateSongsTable(songs);
+        priceDesc = !priceDesc //invertir ordenación
+    }
+
+    var titleDesc = true;
+    function sortByTitle() {
+        if(titleDesc) {
+            songs.sort(function (a, b) {
+                return parseFloat(a.title) - parseFloat(b.title);
+            });
+        } else {
+            songs.sort(function (a, b) {
+                return parseFloat(b.title) - parseFloat(a.title);
+            });
+        }
+        updateSongsTable(songs);
+        titleDesc = !titleDesc; // invertir ordenación
     }
 
     loadSongs();
